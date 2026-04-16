@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Button Test</title>
+<style>
+  body { font-family: sans-serif; padding: 40px; background: #0d1b2a; color: white; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  input { display: block; margin: 10px 0; padding: 8px; width: 300px; }
+  button { padding: 12px 24px; background: #c9a84c; border: none; cursor: pointer; font-size: 16px; margin-top: 10px; }
+  #result { margin-top: 20px; padding: 20px; background: #1a2d45; }
+</style>
+</head>
+<body>
+
+<div class="screen active" id="screen1">
+  <h2>Screen 1 — Welcome</h2>
+  <input type="text" id="testName" placeholder="Your name"/>
+  <input type="email" id="testEmail" placeholder="Your email"/>
+  <button id="testBtn">Let's Begin!</button>
+  <p id="errorMsg" style="color:red; display:none;">Please fill in all fields.</p>
+</div>
+
+<div class="screen" id="screen2">
+  <h2>Screen 2 — Success!</h2>
+  <p id="result"></p>
+  <button id="backBtn">← Back</button>
+</div>
+
+<script>
+var nameEl = document.getElementById('testName');
+var emailEl = document.getElementById('testEmail');
+var errorEl = document.getElementById('errorMsg');
+var resultEl = document.getElementById('result');
+
+document.getElementById('testBtn').addEventListener('click', function() {
+  var name = nameEl.value.trim();
+  var email = emailEl.value.trim();
+
+  if (!name || !email || email.indexOf('@') === -1) {
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  errorEl.style.display = 'none';
+  resultEl.textContent = 'Hello ' + name + ' (' + email + ') — navigation works!';
+
+  document.getElementById('screen1').classList.remove('active');
+  document.getElementById('screen2').classList.add('active');
+});
+
+document.getElementById('backBtn').addEventListener('click', function() {
+  document.getElementById('screen2').classList.remove('active');
+  document.getElementById('screen1').classList.add('active');
+});
+</script>
+
+</body>
+</html>
