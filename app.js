@@ -96,8 +96,28 @@ function startGame() {
 // Attach Let's Begin button listener directly
 document.getElementById('btnStart').addEventListener('click', startGame);
 
-// ─── MODULE 1: DRAG & DROP ────────────────────────────────────
+// ─── MODULE 1: DRAG & DROP (desktop) + TAP TO PLACE (mobile) ─────────────────
+
+var selectedChip = null; // tracks currently selected chip on touch devices
+
+function isTouchDevice() {
+  return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+}
+
+function clearChipSelection() {
+  if (selectedChip) {
+    selectedChip.style.border = '';
+    selectedChip.style.background = '';
+    selectedChip = null;
+  }
+  document.querySelectorAll('#toolSource .tool-chip').forEach(c => {
+    c.style.border = '';
+    c.style.background = '';
+  });
+}
+
 function attachDragListeners(chip) {
+  // Desktop drag
   chip.addEventListener('dragstart', e => {
     draggedTool = chip;
     setTimeout(() => chip.classList.add('dragging'), 0);
@@ -105,6 +125,18 @@ function attachDragListeners(chip) {
   chip.addEventListener('dragend', () => {
     chip.classList.remove('dragging');
     draggedTool = null;
+  });
+  // Mobile tap — select chip
+  chip.addEventListener('click', () => {
+    if (!isTouchDevice() && !('ontouchstart' in window)) return;
+    if (selectedChip === chip) {
+      clearChipSelection();
+      return;
+    }
+    clearChipSelection();
+    selectedChip = chip;
+    chip.style.border = '2px solid #c9a84c';
+    chip.style.background = 'rgba(201,168,76,0.18)';
   });
 }
 
@@ -119,11 +151,8 @@ function handleDragLeave(e) {
   e.currentTarget.classList.remove('drag-over');
 }
 
-function handleDrop(e, zone) {
-  e.preventDefault();
-  e.currentTarget.classList.remove('drag-over');
-  if (!draggedTool) return;
-  const toolName = draggedTool.dataset.tool;
+function placeToolInZone(toolName, toolLabel, zone) {
+  // Remove from all zones and source
   ['green','amber','red','grey'].forEach(z => {
     state.tools[z] = state.tools[z].filter(t => t !== toolName);
     const container = document.getElementById('chips-' + z);
@@ -135,23 +164,39 @@ function handleDrop(e, zone) {
   [...src.querySelectorAll('.tool-chip')].forEach(c => {
     if (c.dataset.tool === toolName) c.remove();
   });
+  // Add to new zone
   state.tools[zone].push(toolName);
   const container = document.getElementById('chips-' + zone);
   const newChip = document.createElement('div');
   newChip.className = 'tool-chip';
   newChip.dataset.tool = toolName;
-  newChip.textContent = draggedTool.textContent;
-  newChip.title = 'Click to return to source';
+  newChip.textContent = toolLabel;
+  newChip.title = 'Tap or click to return to source';
   newChip.addEventListener('click', () => returnToSource(newChip, zone));
   container.appendChild(newChip);
 }
 
-// Attach drag zone listeners directly
+function handleDrop(e, zone) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!draggedTool) return;
+  placeToolInZone(draggedTool.dataset.tool, draggedTool.textContent, zone);
+}
+
+// Attach drag and tap zone listeners
 ['green','amber','red','grey'].forEach(zone => {
   const el = document.getElementById('zone-' + zone);
   el.addEventListener('dragover', handleDragOver);
   el.addEventListener('dragleave', handleDragLeave);
   el.addEventListener('drop', e => handleDrop(e, zone));
+  // Mobile tap on zone — place selected chip
+  el.addEventListener('click', e => {
+    if (!selectedChip) return;
+    // Make sure the click is on the zone itself, not a chip inside it
+    if (e.target.classList.contains('tool-chip')) return;
+    placeToolInZone(selectedChip.dataset.tool, selectedChip.textContent, zone);
+    clearChipSelection();
+  });
 });
 
 function returnToSource(chip, zone) {
@@ -166,6 +211,7 @@ function returnToSource(chip, zone) {
   restored.textContent = toolName;
   attachDragListeners(restored);
   src.appendChild(restored);
+  clearChipSelection();
 }
 
 // ─── MODULE 2: SCENARIO SELECTION — handled by direct listeners below ────────
@@ -373,6 +419,7 @@ function downloadProfile() {
 
 // ─── RESTART ─────────────────────────────────────────────────
 function restartGame() {
+  clearChipSelection();
   state.respondent = { name: '', department: '', email: '' };
   state.tools = { green: [], amber: [], red: [], grey: [] };
   state.scenarioA = null;
