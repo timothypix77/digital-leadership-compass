@@ -931,11 +931,31 @@
     line-height: 1.65;
     color: var(--slate-light);
   }
+  /* BROWSER NOTICE */
+  .browser-notice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(201,168,76,0.12);
+    border-bottom: 1px solid rgba(201,168,76,0.25);
+    padding: 10px 24px;
+    font-size: 13px;
+    color: var(--gold-light);
+    position: sticky;
+    top: 0;
+    z-index: 99;
+  }
 
 
 </style>
 </head>
 <body>
+
+<div class="browser-notice" id="browserNotice">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+  For the best experience, please use <strong>Chrome</strong>, <strong>Edge</strong>, or <strong>Safari</strong>.
+  <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;color:inherit;cursor:pointer;font-size:16px;padding:0 0 0 12px;opacity:0.7;">✕</button>
+</div>
 
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 
