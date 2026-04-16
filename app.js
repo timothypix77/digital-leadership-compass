@@ -16,6 +16,15 @@ function goToScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Re-attach drag listeners when module1 becomes visible
+  if (id === 'module1') {
+    document.querySelectorAll('#toolSource .tool-chip').forEach(chip => {
+      // Remove old listeners by cloning
+      const fresh = chip.cloneNode(true);
+      chip.parentNode.replaceChild(fresh, chip);
+      attachDragListeners(fresh);
+    });
+  }
 }
 
 function updateProgress(module) {
