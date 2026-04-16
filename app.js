@@ -1,3 +1,40 @@
+// ─── SUPABASE CONFIG ─────────────────────────────────────────
+const SUPABASE_URL = 'https://rtmflwfxvjcnnfbeosmo.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0bWZsd2Z4dmpjbm5mYmVvc21vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzMTYyOTksImV4cCI6MjA5MTg5MjI5OX0.NUvtnf184qJlt8jo8BRfzZkj37Deya2rJTzauH0wtjI';
+
+async function saveResponse(scores, archetype) {
+  try {
+    const payload = {
+      name:          state.respondent.name,
+      department:    state.respondent.department,
+      email:         state.respondent.email,
+      fluency_score: scores.fluency,
+      ways_score:    scores.data,
+      ai_score:      scores.ai,
+      mindset_score: scores.mindset,
+      archetype:     archetype,
+      scenario_a:    state.scenarioA || '',
+      scenario_b:    state.scenarioB || '',
+      open_text:     state.openText  || ''
+    };
+    const response = await fetch(SUPABASE_URL + '/rest/v1/responses', {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'apikey':        SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Prefer':        'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      console.error('Supabase save failed:', response.status, await response.text());
+    }
+  } catch (err) {
+    console.error('Supabase error:', err);
+  }
+}
+
 // ─── STATE ───────────────────────────────────────────────────
 const state = {
   respondent: { name: '', department: '', email: '' },
@@ -212,6 +249,9 @@ function generateProfile() {
   state.openText = document.getElementById('openText').value;
   const scores = computeScores();
   const archetype = getArchetype(scores);
+
+  // Save response to Supabase
+  saveResponse(scores, archetype);
 
   goToScreen('profile');
   document.getElementById('progressFill').style.width = '100%';
