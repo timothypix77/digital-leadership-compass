@@ -174,6 +174,7 @@ function placeToolInZone(toolName, toolLabel, zone) {
   newChip.title = 'Tap or click to return to source';
   newChip.addEventListener('click', () => returnToSource(newChip, zone));
   container.appendChild(newChip);
+  updateToolsCounter();
 }
 
 function handleDrop(e, zone) {
@@ -212,6 +213,7 @@ function returnToSource(chip, zone) {
   attachDragListeners(restored);
   src.appendChild(restored);
   clearChipSelection();
+  updateToolsCounter();
 }
 
 // ─── MODULE 2: SCENARIO SELECTION — handled by direct listeners below ────────
@@ -225,10 +227,10 @@ function computeScores() {
     Math.round(((state.tools.green.length * 100 + state.tools.amber.length * 60 + state.tools.red.length * 30 + state.tools.grey.length * 5) / (totalSorted * 100)) * 100);
 
   // Digital-enabled Ways of Working: scored from scenario A and B responses
-  // Scenario A: B=most sophisticated (process-first + integration rigour), E=process simplification (legitimate), C=experimentation, D=risk-cautious, A=top-down
-  // Scenario B: D=collaborative ownership (highest), B=stakeholder-first, C=methodical, A=proactive-unilateral, E=status-quo
+  // Scenario A: B=process-first+integration rigour, C=experimentation, E=process simplification, D=risk-cautious, A=top-down
+  // Scenario B: E=collaborative ownership (highest), B=stakeholder-first, D=methodical, A=proactive-unilateral, C=status-quo/resistance
   const scenarioAScores = { A: 45, B: 90, C: 75, D: 55, E: 65 };
-  const scenarioBScores = { A: 60, B: 80, C: 70, D: 90, E: 35 };
+  const scenarioBScores = { A: 60, B: 80, C: 35, D: 70, E: 90 };
   const wowA = state.scenarioA ? scenarioAScores[state.scenarioA] : 50;
   const wowB = state.scenarioB ? scenarioBScores[state.scenarioB] : 50;
   const dataRaw = Math.round((wowA + wowB) / 2);
@@ -313,7 +315,7 @@ function generateProfile() {
       tagline: '"I understand digital, data and AI well enough to lead responsibly."',
       narrative: `Your profile reflects a <strong>genuine and honest starting point</strong> — you have a foundational awareness of the digital landscape and an instinct for the governance principles that responsible digital leadership requires. This matters more than it might seem: leaders who know what they don't yet know are significantly better positioned to grow than those who overestimate their readiness. The most common pattern at this stage is not a lack of capability, but a <strong>lack of structured opportunity to build confidence through practice</strong>. The distance between where you are now and the next level of digital leadership is shorter than it looks — and the most effective way to close it is through deliberate, low-risk experimentation in your own team's work, rather than through formal training alone.`,
       steps: [
-        { icon: '🎯', title: 'Pick one tool, apply it to one real task', text: 'Choose a single recurring task your team handles and explore whether one of the tools in this exercise could reduce the effort involved. A small, concrete win with a real work task builds more confidence than any training programme — and gives you something specific to share with your team.' },
+        { icon: '🎯', title: 'Pick one tool, apply it to one real task', text: 'Choose a single recurring task your team handles and explore whether one of the tools in this exercise could reduce the effort involved. For example: drafting a routine report, summarising long documents, formatting meeting minutes, or sorting through stakeholder feedback. A small, concrete win with a real work task builds more confidence than any training programme — and gives you something specific to share with your team.' },
         { icon: '🤝', title: 'Find a peer who is one step ahead', text: 'Identify a colleague in another team who has embedded digital tools more actively into their work. Ask them for 30 minutes to walk you through what they actually do — not the theory, but the practice. Peer learning at this level is faster and stickier than structured courses.' },
         { icon: '🛡️', title: 'Get clear on the guardrails', text: 'One of the most common blockers at this stage is uncertainty about what is and isn\'t permitted when using digital and AI tools at work. Spend time clarifying your organisation\'s guidance on responsible AI use and data handling — not to find reasons to hold back, but so you can move forward with confidence.' }
       ]
@@ -324,7 +326,7 @@ function generateProfile() {
       narrative: `Your profile reflects a leader who is <strong>genuinely engaged with digital tools and thinking carefully</strong> about how they apply to your work. You demonstrate real capability across the four dimensions — and the pattern that typically emerges at this stage is an interesting one: the tools are working well for you personally, but that capability may not yet be fully visible or systematically embedded in how your team operates day to day. The most valuable shift from here is not about learning more tools — it is about making a <strong>deliberate move from digital user to digital culture-setter</strong>. Being explicit about how and why you use digital tools, creating structured space for your team to experiment, and actively shaping the conditions for your team's capability to grow alongside yours. You are closer to the next level than you might think — the shift is primarily one of <strong>leadership behaviour, not technical knowledge</strong>.`,
       steps: [
         { icon: '🔁', title: 'Make your practice visible to your team', text: 'You are likely already using digital tools effectively — but does your team know that? Be deliberate about naming which tools you use, why you chose them, and what they have changed in your work. Visible role-modelling is the most powerful adoption signal a leader can send, and it costs nothing.' },
-        { icon: '⚙️', title: 'Redesign one workflow with your team, not for them', text: 'Identify the process in your team with the most manual effort and map it for digital optimisation — but involve your team in the redesign rather than presenting a solution. Co-designing a workflow change builds your team\'s digital instincts and their ownership of the outcome simultaneously.' },
+        { icon: '⚙️', title: 'Redesign one workflow with your team, not for them', text: 'Identify the process in your team with the most manual effort and map it for digital optimisation — but involve your team in the redesign rather than presenting a solution. Common examples include status reporting cycles, approval routing chains, recurring data consolidation tasks, or onboarding workflows. Co-designing a workflow change builds your team\'s digital instincts and their ownership of the outcome simultaneously.' },
         { icon: '🌐', title: 'Create one cross-team learning moment', text: 'At your stage, some of the highest-value development comes from exposure to how peers in other teams are working digitally. Organise or join a brief cross-team conversation about what is working — a 45-minute shared reflection across two or three teams often surfaces more practical insight than a formal course.' }
       ]
     },
@@ -437,9 +439,8 @@ function restartGame() {
   const tools = [
     ['Pair','Pair'],['AIBots','AIBots'],['Transcribe','Transcribe'],
     ['AORA','AORA'],['Navi','Navi'],['Copilot','Copilot'],
-    ['MS Teams','MS Teams'],['Power Platform','Power Platform'],
-    ['Power Apps','Power Apps'],['Power Automate','Power Automate'],
-    ['Power BI','Power BI'],
+    ['MS Teams','MS Teams'],['Power Apps','Power Apps'],
+    ['Power Automate','Power Automate'],['Power BI','Power BI'],
   ];
   tools.forEach(([dataName, label]) => {
     const chip = document.createElement('div');
@@ -466,16 +467,75 @@ function restartGame() {
   document.getElementById('regEmail').classList.remove('error');
   document.getElementById('spikeCallout').innerHTML = '';
   document.getElementById('progressFill').style.width = '0%';
+  updateToolsCounter();
   goToScreen('welcome');
 }
 
 // ─── DIRECT EVENT LISTENERS (most reliable across all environments) ──────────
 
-// Navigation buttons
+// ─── COMPLETION VALIDATION ───────────────────────────────────
+function updateToolsCounter() {
+  const counterEl = document.getElementById('toolsCounter');
+  if (!counterEl) return;
+  const placed = state.tools.green.length + state.tools.amber.length + state.tools.red.length + state.tools.grey.length;
+  counterEl.textContent = placed + ' of 10 placed';
+  counterEl.style.color = placed === 10 ? 'var(--green)' : 'var(--gold)';
+}
+
+function showValidationError(button, message) {
+  // Remove any existing error first
+  const navRow = button.closest('.nav-row');
+  let errorEl = navRow.parentElement.querySelector('.validation-error');
+  if (!errorEl) {
+    errorEl = document.createElement('p');
+    errorEl.className = 'validation-error';
+    errorEl.style.cssText = 'color: var(--red); font-size: 13px; text-align: right; margin-top: 8px; padding-right: 4px;';
+    navRow.parentElement.insertBefore(errorEl, navRow);
+  }
+  errorEl.textContent = message;
+  // Auto-hide after 5 seconds
+  setTimeout(() => { if (errorEl.parentElement) errorEl.remove(); }, 5000);
+}
+
+function validateModule(moduleId) {
+  if (moduleId === 'module1') {
+    const placed = state.tools.green.length + state.tools.amber.length + state.tools.red.length + state.tools.grey.length;
+    if (placed < 10) return 'Please sort all 10 tools into a zone before continuing (' + placed + ' of 10 placed).';
+  }
+  if (moduleId === 'module2') {
+    if (!state.scenarioA && !state.scenarioB) return 'Please respond to both scenarios before continuing.';
+    if (!state.scenarioA) return 'Please respond to Situation A before continuing.';
+    if (!state.scenarioB) return 'Please respond to Situation B before continuing.';
+  }
+  if (moduleId === 'module3') {
+    const answered = state.ffAnswers.filter(a => a !== null).length;
+    if (answered < 10) return 'Please respond to all 10 statements before continuing (' + answered + ' of 10 answered).';
+  }
+  if (moduleId === 'module4') {
+    const answered = state.tradeoffs.filter(a => a !== null).length;
+    if (answered < 6) return 'Please respond to all 6 pairs before continuing (' + answered + ' of 6 answered).';
+  }
+  return null;
+}
+
+// Navigation buttons — with validation for forward navigation
 document.querySelectorAll('[data-goto]').forEach(btn => {
   btn.addEventListener('click', () => {
     const target = btn.dataset.goto;
     const progress = btn.dataset.progress;
+    // Validate current module before moving forward (not when going back)
+    const currentScreen = document.querySelector('.screen.active');
+    if (currentScreen && currentScreen.id.startsWith('module')) {
+      const currentNum = parseInt(currentScreen.id.replace('module', ''));
+      const targetNum = target === 'welcome' ? 0 : parseInt(target.replace('module', ''));
+      if (targetNum > currentNum) {
+        const error = validateModule(currentScreen.id);
+        if (error) {
+          showValidationError(btn, error);
+          return;
+        }
+      }
+    }
     goToScreen(target);
     if (progress) updateProgress(parseInt(progress));
   });
@@ -526,8 +586,15 @@ document.querySelectorAll('.tradeoff-option').forEach(option => {
   });
 });
 
-// Generate profile button
-document.getElementById('btnGenerateProfile').addEventListener('click', generateProfile);
+// Generate profile button — with Module 4 validation
+document.getElementById('btnGenerateProfile').addEventListener('click', function() {
+  const error = validateModule('module4');
+  if (error) {
+    showValidationError(this, error);
+    return;
+  }
+  generateProfile();
+});
 
 // Download and restart buttons
 document.getElementById('btnDownload').addEventListener('click', downloadProfile);
