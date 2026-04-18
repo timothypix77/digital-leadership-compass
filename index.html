@@ -87,10 +87,11 @@
 
   /* HEADER */
   .compass-header {
-    padding: 28px 40px 20px;
+    padding: 28px 20px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
     border-bottom: 1px solid rgba(255,255,255,0.05);
   }
   .compass-logo {
@@ -122,6 +123,8 @@
     font-size: 12px;
     color: var(--slate);
     letter-spacing: 0.05em;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .module-indicator span { color: var(--gold); }
 
@@ -184,21 +187,21 @@
   .welcome-meta {
     display: flex;
     justify-content: center;
-    gap: 32px;
-    margin-bottom: 48px;
-  }
-  .meta-item {
-    display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .meta-text {
     font-size: 13px;
-    color: var(--slate);
+    color: var(--slate-light);
   }
-  .meta-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--gold);
+  .meta-divider {
+    color: var(--gold);
+    font-size: 13px;
+    opacity: 0.6;
   }
+
   .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -297,7 +300,6 @@
     color: var(--slate-light);
     line-height: 1.65;
     margin-bottom: 36px;
-    max-width: 600px;
   }
 
   /* DIVIDER */
@@ -718,11 +720,29 @@
   }
   .dimension-row {
     display: grid;
-    grid-template-columns: 180px 1fr 40px;
+    grid-template-columns: 220px 1fr 40px;
     gap: 14px;
     align-items: center;
   }
-  .dimension-name { font-size: 13px; color: var(--slate-light); text-align: right; }
+  @media (max-width: 640px) {
+    .dimension-row {
+      grid-template-columns: 1fr 50px;
+      gap: 8px;
+    }
+    .dimension-row .dimension-name {
+      grid-column: 1 / -1;
+      text-align: left;
+      margin-bottom: -4px;
+    }
+    .dimension-row .dim-bar-track {
+      grid-column: 1;
+    }
+    .dimension-row .dim-score {
+      grid-column: 2;
+      text-align: right;
+    }
+  }
+  .dimension-name { font-size: 13px; color: var(--slate-light); text-align: right; line-height: 1.3; }
   .dim-bar-track {
     height: 8px;
     background: var(--navy-light);
@@ -931,31 +951,11 @@
     line-height: 1.65;
     color: var(--slate-light);
   }
-  /* BROWSER NOTICE */
-  .browser-notice {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(201,168,76,0.12);
-    border-bottom: 1px solid rgba(201,168,76,0.25);
-    padding: 10px 24px;
-    font-size: 13px;
-    color: var(--gold-light);
-    position: sticky;
-    top: 0;
-    z-index: 99;
-  }
 
 
 </style>
 </head>
 <body>
-
-<div class="browser-notice" id="browserNotice">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-  For the best experience, please use <strong>Chrome</strong>, <strong>Edge</strong>, or <strong>Safari</strong>.
-  <button onclick="this.parentElement.style.display='none'" style="background:none;border:none;color:inherit;cursor:pointer;font-size:16px;padding:0 0 0 12px;opacity:0.7;">✕</button>
-</div>
 
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 
@@ -998,10 +998,13 @@
     </p>
 
     <div class="welcome-meta">
-      <div class="meta-item"><div class="meta-dot"></div> 4 modules</div>
-      <div class="meta-item"><div class="meta-dot"></div> 10 minutes</div>
-      <div class="meta-item"><div class="meta-dot"></div> Instant profile</div>
-      <div class="meta-item"><div class="meta-dot"></div> Immediate next steps</div>
+      <span class="meta-text">4 modules</span>
+      <span class="meta-divider">|</span>
+      <span class="meta-text">10 minutes</span>
+      <span class="meta-divider">|</span>
+      <span class="meta-text">Instant profile</span>
+      <span class="meta-divider">|</span>
+      <span class="meta-text">Immediate next steps</span>
     </div>
 
     <div class="registration-card">
@@ -1029,10 +1032,6 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>
     </div>
-
-    <p style="font-size:12px; color:var(--slate); margin-top:28px; max-width:480px; margin-left:auto; margin-right:auto; line-height:1.6;">
-      Your responses are collected for organisational capability planning purposes only. Individual results are treated confidentially and reported in aggregate. They will not be used in performance evaluation or shared with your line manager.
-    </p>
   </div>
 </div>
 
@@ -1071,7 +1070,7 @@
       <em>On mobile: tap a tool to select it (it will highlight), then tap a zone to place it.</em>
     </p>
 
-    <p class="source-label">Tools to sort — drag each into a zone below</p>
+    <p class="source-label">Tools to sort — drag each into a zone below · <span id="toolsCounter" style="color:var(--gold);">0 of 10 placed</span></p>
     <div class="tool-source" id="toolSource">
       <div class="tool-chip" draggable="true" data-tool="Pair">Pair</div>
       <div class="tool-chip" draggable="true" data-tool="AIBots">AIBots</div>
@@ -1080,7 +1079,6 @@
       <div class="tool-chip" draggable="true" data-tool="Navi">Navi</div>
       <div class="tool-chip" draggable="true" data-tool="Copilot">Copilot</div>
       <div class="tool-chip" draggable="true" data-tool="MS Teams">MS Teams</div>
-      <div class="tool-chip" draggable="true" data-tool="Power Platform">Power Platform</div>
       <div class="tool-chip" draggable="true" data-tool="Power Apps">Power Apps</div>
       <div class="tool-chip" draggable="true" data-tool="Power Automate">Power Automate</div>
       <div class="tool-chip" draggable="true" data-tool="Power BI">Power BI</div>
@@ -1166,7 +1164,7 @@
       Digital-enabled Ways of Working
     </div>
     <h2 class="module-title">How You Work With Digital</h2>
-    <p class="module-desc">Two short workplace situations. For each, choose the response that most honestly reflects what you would actually do — not the ideal answer.</p>
+    <p class="module-desc">Two short workplace situations. For each, choose the response that most honestly reflects your first instinct — not the ideal answer. You may feel you would do more than one of these; that is entirely normal. Choose the option that reflects your strongest inclination.</p>
 
     <div class="scenario-card">
       <div class="scenario-context">Situation A — Your team · A recurring workflow</div>
@@ -1178,23 +1176,23 @@
     <div class="choice-grid" id="module2choicesA">
       <div class="choice-card" data-choice="A">
         <div class="choice-letter">A</div>
-        <div class="choice-text">Review the tool independently and, if it looks suitable, direct the team to switch over and phase out the manual process.</div>
+        <div class="choice-text">Assess the tool myself and direct the team to adopt it if suitable.</div>
       </div>
       <div class="choice-card" data-choice="B">
         <div class="choice-letter">B</div>
-        <div class="choice-text">Map the existing process with the team first to understand where the real friction points are, then assess whether the tool actually addresses them before deciding whether to adopt it.</div>
+        <div class="choice-text">Map our current process with the team first, then assess whether the tool actually addresses our friction points.</div>
       </div>
       <div class="choice-card" data-choice="C">
         <div class="choice-letter">C</div>
-        <div class="choice-text">Flag it to the team as something worth exploring, and invite whoever is interested to trial it on a smaller task and report back.</div>
+        <div class="choice-text">Flag it to the team and invite interested members to trial it on a smaller task.</div>
       </div>
       <div class="choice-card" data-choice="D">
         <div class="choice-letter">D</div>
-        <div class="choice-text">Check whether other teams have already adopted it and what their experience has been before committing to any change.</div>
+        <div class="choice-text">Check how other teams have found it before committing to any change.</div>
       </div>
       <div class="choice-card" data-choice="E">
         <div class="choice-letter">E</div>
-        <div class="choice-text">Step back and look at whether the process itself needs simplifying first. If the manual steps can be reduced or eliminated through better workflow design, that may be the right fix — with or without a digital tool.</div>
+        <div class="choice-text">Step back and simplify the process first — the right fix may not require a digital tool at all.</div>
       </div>
     </div>
 
@@ -1210,23 +1208,23 @@
     <div class="choice-grid" id="module2choicesB">
       <div class="choice-card" data-choice="A">
         <div class="choice-letter">A</div>
-        <div class="choice-text">Agree it is a good idea and set up the shared workspace yourself, then brief the group on how to use it.</div>
+        <div class="choice-text">Support the idea and set up the shared workspace myself, then brief the group.</div>
       </div>
       <div class="choice-card" data-choice="B">
         <div class="choice-letter">B</div>
-        <div class="choice-text">Support the suggestion but raise it with all division leads first — getting buy-in before changing how the group works will matter more than the tool choice itself.</div>
+        <div class="choice-text">Raise it with all division leads first — buy-in matters more than the tool choice.</div>
       </div>
       <div class="choice-card" data-choice="C">
         <div class="choice-letter">C</div>
-        <div class="choice-text">Trial the shared workspace with your own division's members first to work out the setup before rolling it out to the wider group.</div>
+        <div class="choice-text">Keep the current approach and tighten the check-in rhythm instead — email and a clearer meeting cadence may be sufficient.</div>
       </div>
       <div class="choice-card" data-choice="D">
         <div class="choice-letter">D</div>
-        <div class="choice-text">Ask the team member who suggested it to propose a specific tool and a simple protocol, then bring that to the group for a decision together.</div>
+        <div class="choice-text">Trial the workspace with my own team first before rolling it out to the wider group.</div>
       </div>
       <div class="choice-card" data-choice="E">
         <div class="choice-letter">E</div>
-        <div class="choice-text">Keep the current approach for now and focus on tightening the check-in rhythm instead — a clearer meeting cadence and a shared email thread may be sufficient without introducing a new platform mid-delivery.</div>
+        <div class="choice-text">Ask the team member who suggested it to propose a specific tool and protocol, then decide together as a group.</div>
       </div>
     </div>
 
@@ -1275,7 +1273,7 @@
 
     <div id="ffStatements">
       <div class="ff-statement" data-index="0">
-        <div class="ff-text">An AI tool that produces fluent, well-structured responses is demonstrating that it understands the content it is generating.</div>
+        <div class="ff-text">An AI tool that gives confident, well-written responses actually understands what it is saying.</div>
         <div class="ff-buttons">
           <button class="ff-btn" data-index="0" data-value="true">True</button>
           <button class="ff-btn" data-index="0" data-value="false">False</button>
@@ -1291,7 +1289,7 @@
         </div>
       </div>
       <div class="ff-statement" data-index="2">
-        <div class="ff-text">Entering work-related information into a publicly accessible AI tool carries data risk, regardless of whether the information is marked as sensitive.</div>
+        <div class="ff-text">It is safe to use a commercially available AI tool for work tasks, as long as the information involved does not feel sensitive to you personally.</div>
         <div class="ff-buttons">
           <button class="ff-btn" data-index="2" data-value="true">True</button>
           <button class="ff-btn" data-index="2" data-value="false">False</button>
@@ -1323,7 +1321,7 @@
         </div>
       </div>
       <div class="ff-statement" data-index="6">
-        <div class="ff-text">A digital tool that works well in one team's workflow can be assumed to carry similar risks when adopted by a different team.</div>
+        <div class="ff-text">Once a digital tool has been risk-assessed and approved for one team, that assessment can be applied to any other team adopting the same tool.</div>
         <div class="ff-buttons">
           <button class="ff-btn" data-index="6" data-value="true">True</button>
           <button class="ff-btn" data-index="6" data-value="false">False</button>
@@ -1331,7 +1329,7 @@
         </div>
       </div>
       <div class="ff-statement" data-index="7">
-        <div class="ff-text">Keeping up with technological trends is primarily the responsibility of the organisation's IT or digital team, not line managers.</div>
+        <div class="ff-text">Keeping up with technological trends is primarily the responsibility of the organisation's IT or digital team, not supervisors.</div>
         <div class="ff-buttons">
           <button class="ff-btn" data-index="7" data-value="true">True</button>
           <button class="ff-btn" data-index="7" data-value="false">False</button>
@@ -1339,7 +1337,7 @@
         </div>
       </div>
       <div class="ff-statement" data-index="8">
-        <div class="ff-text">An AI tool that cites specific facts, figures, or references can be trusted to have retrieved those accurately from its training data.</div>
+        <div class="ff-text">When an AI tool cites specific facts, figures, or sources, those references can be trusted to be accurate.</div>
         <div class="ff-buttons">
           <button class="ff-btn" data-index="8" data-value="true">True</button>
           <button class="ff-btn" data-index="8" data-value="false">False</button>
@@ -1347,7 +1345,7 @@
         </div>
       </div>
       <div class="ff-statement" data-index="9">
-        <div class="ff-text">When planning a new initiative, considering how emerging digital tools might affect its implementation or outcomes is a useful part of the planning process.</div>
+        <div class="ff-text">When planning a new initiative, it is worth considering how emerging digital tools could affect how it is delivered or what it achieves.</div>
         <div class="ff-buttons">
           <button class="ff-btn" data-index="9" data-value="true">True</button>
           <button class="ff-btn" data-index="9" data-value="false">False</button>
@@ -1394,56 +1392,56 @@
     </div>
     <h2 class="module-title">Your Leadership Stance</h2>
     <p class="module-desc">
-      Six pairs of statements. For each pair, choose the one that more honestly reflects how you lead today. Both options are held by capable leaders — this is about understanding where you currently are, not where you should be.
+      Six pairs of statements. For each pair, both options are held by capable leaders — choose the one closer to your default instinct, even if both feel partly true.
     </p>
 
     <div id="tradeoffs">
       <div class="tradeoff-card" data-pair="0">
         <div class="tradeoff-num">PAIR 01 OF 06 — On experimentation</div>
         <div class="tradeoff-options">
-          <div class="tradeoff-option" data-value="A">I'd rather my team master a proven process and execute it reliably.</div>
+          <div class="tradeoff-option" data-value="A">I prefer my team to master a proven process and execute it reliably.</div>
           <div class="tradeoff-vs">or</div>
-          <div class="tradeoff-option" data-value="B">I'd rather my team experiment with improving the process, even if it produces uneven results along the way.</div>
+          <div class="tradeoff-option" data-value="B">I prefer my team to experiment and improve our processes, even if results are uneven at first.</div>
         </div>
       </div>
       <div class="tradeoff-card" data-pair="1">
         <div class="tradeoff-num">PAIR 02 OF 06 — On role-modelling digital adoption</div>
         <div class="tradeoff-options">
-          <div class="tradeoff-option" data-value="A">I tend to let my team find their own way with new digital tools — they often know more about the tools than I do.</div>
+          <div class="tradeoff-option" data-value="A">I let my team find their own way with new digital tools — they often know more than I do.</div>
           <div class="tradeoff-vs">or</div>
-          <div class="tradeoff-option" data-value="B">I make a point of visibly using new digital tools myself, so my team can see that adoption is expected at all levels.</div>
+          <div class="tradeoff-option" data-value="B">I visibly use new digital tools myself, so my team sees that adoption is expected at all levels.</div>
         </div>
       </div>
       <div class="tradeoff-card" data-pair="2">
         <div class="tradeoff-num">PAIR 03 OF 06 — On addressing resistance</div>
         <div class="tradeoff-options">
-          <div class="tradeoff-option" data-value="A">When my team is resistant to a new digital initiative, my first instinct is to communicate the rationale more clearly.</div>
+          <div class="tradeoff-option" data-value="A">When my team resists a digital initiative, I focus on communicating the rationale more clearly.</div>
           <div class="tradeoff-vs">or</div>
-          <div class="tradeoff-option" data-value="B">When my team is resistant to a new digital initiative, my first instinct is to understand what specifically is making them hesitate.</div>
+          <div class="tradeoff-option" data-value="B">When my team resists a digital initiative, I focus on understanding what is specifically making them hesitate.</div>
         </div>
       </div>
       <div class="tradeoff-card" data-pair="3">
         <div class="tradeoff-num">PAIR 04 OF 06 — On communicating digital change</div>
         <div class="tradeoff-options">
-          <div class="tradeoff-option" data-value="A">When communicating a digital initiative to stakeholders, I focus primarily on the benefits it will deliver.</div>
+          <div class="tradeoff-option" data-value="A">I focus on the benefits when communicating a digital initiative to stakeholders.</div>
           <div class="tradeoff-vs">or</div>
-          <div class="tradeoff-option" data-value="B">When communicating a digital initiative to stakeholders, I address both what will improve and what will need to change or be given up.</div>
+          <div class="tradeoff-option" data-value="B">I address both the benefits and what will need to change when communicating a digital initiative to stakeholders.</div>
         </div>
       </div>
       <div class="tradeoff-card" data-pair="4">
         <div class="tradeoff-num">PAIR 05 OF 06 — On building a digital-ready team culture</div>
         <div class="tradeoff-options">
-          <div class="tradeoff-option" data-value="A">Building digital capability in my team is primarily a matter of ensuring they have access to the right training and tools.</div>
+          <div class="tradeoff-option" data-value="A">I build digital capability in my team by ensuring they have access to the right training and tools.</div>
           <div class="tradeoff-vs">or</div>
-          <div class="tradeoff-option" data-value="B">Building digital capability in my team requires me to actively shape the culture — creating space for experimentation, tolerating early mistakes, and recognising effort as much as results.</div>
+          <div class="tradeoff-option" data-value="B">I build digital capability in my team by actively shaping the culture — making space for experimentation and tolerating early mistakes.</div>
         </div>
       </div>
       <div class="tradeoff-card" data-pair="5">
-        <div class="tradeoff-num">PAIR 06 OF 06 — On creating conditions for digital development</div>
+        <div class="tradeoff-num">PAIR 06 OF 06 — On creating conditions for growth</div>
         <div class="tradeoff-options">
-          <div class="tradeoff-option" data-value="A">If a team member wants to develop their digital skills, the motivation and initiative should primarily come from them.</div>
+          <div class="tradeoff-option" data-value="A">I expect team members who want to develop their digital skills to take the initiative themselves.</div>
           <div class="tradeoff-vs">or</div>
-          <div class="tradeoff-option" data-value="B">As a leader, I see it as my responsibility to actively create opportunities for my team to develop and apply digital skills in their work.</div>
+          <div class="tradeoff-option" data-value="B">I actively create opportunities for my team to develop and apply digital skills in their work.</div>
         </div>
       </div>
     </div>
@@ -1483,17 +1481,17 @@
         <div class="dim-score" id="score-fluency">—</div>
       </div>
       <div class="dimension-row">
-        <div class="dimension-name">Digital Ways of Working</div>
+        <div class="dimension-name">Digital-enabled Ways of Working</div>
         <div class="dim-bar-track"><div class="dim-bar-fill" id="bar-data"></div></div>
         <div class="dim-score" id="score-data">—</div>
       </div>
       <div class="dimension-row">
-        <div class="dimension-name">AI & Governance</div>
+        <div class="dimension-name">Responsible AI and Governance</div>
         <div class="dim-bar-track"><div class="dim-bar-fill" id="bar-ai"></div></div>
         <div class="dim-score" id="score-ai">—</div>
       </div>
       <div class="dimension-row">
-        <div class="dimension-name">Leadership Mindset</div>
+        <div class="dimension-name">Digital Leadership Mindset</div>
         <div class="dim-bar-track"><div class="dim-bar-fill" id="bar-mindset"></div></div>
         <div class="dim-score" id="score-mindset">—</div>
       </div>
