@@ -348,9 +348,66 @@
   .tool-source {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
     margin-bottom: 24px;
   }
+  /* BEHAVIOUR CARDS */
+  .behaviour-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--navy-light);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--slate-light);
+    cursor: grab;
+    transition: var(--transition);
+    user-select: none;
+    width: calc(50% - 5px);
+    line-height: 1.4;
+  }
+  .behaviour-card:hover {
+    border-color: var(--gold-border);
+    color: var(--white);
+    background: var(--navy-card);
+    transform: translateY(-1px);
+  }
+  .behaviour-card.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+  }
+  .behaviour-card.selected {
+    border-color: var(--gold);
+    background: rgba(224,191,77,0.12);
+    color: var(--white);
+  }
+  .behaviour-card.highlight-next {
+    animation: pulseGold 1.2s ease-in-out;
+  }
+  @keyframes pulseGold {
+    0%, 100% { border-color: rgba(255,255,255,0.12); box-shadow: none; }
+    50% { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(224,191,77,0.2); }
+  }
+  .behaviour-num {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(224,191,77,0.15);
+    color: var(--gold);
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .behaviour-text {
+    flex: 1;
+  }
+  /* Legacy tool-chip class retained for compatibility */
   .tool-chip {
     padding: 7px 14px;
     background: var(--navy-light);
@@ -374,11 +431,34 @@
     opacity: 0.5;
     cursor: grabbing;
   }
-  .zone-chips { display: flex; flex-wrap: wrap; gap: 6px; min-height: 40px; }
+  .zone-chips { display: flex; flex-wrap: wrap; gap: 8px; min-height: 40px; }
+  /* Placed behaviour cards in zones — slightly smaller */
+  .zone-chips .behaviour-card {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .zone-chips .behaviour-num {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
   .zone-chips .tool-chip {
     font-size: 11px;
     padding: 5px 10px;
     cursor: pointer;
+  }
+  /* Mobile: full-width cards in source pool, stacked zones */
+  @media (max-width: 640px) {
+    .behaviour-card { width: 100%; }
+    .tool-source {
+      max-height: 260px;
+      overflow-y: auto;
+      padding: 4px;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 10px;
+    }
   }
   .source-label {
     font-size: 11px;
@@ -1062,26 +1142,56 @@
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
       Digital Fluency & Product Mastery
     </div>
-    <h2 class="module-title">Your Digital Toolkit</h2>
+    <h2 class="module-title">Your Digital Work Behaviours</h2>
     <p class="module-desc">
-      Below is a set of digital tools in your work environment. Drag each one into the zone that best describes how you currently use it. There are no right answers — place each tool where it honestly sits for you today.
+      Below is a set of digital work behaviours. Sort each into the zone that best describes how it fits into your work today. There are no right answers — place each behaviour where it honestly sits for you.
     </p>
     <p class="module-desc" style="font-size:13px; color:var(--slate); margin-top:-24px; margin-bottom:28px;">
-      <em>On mobile: tap a tool to select it (it will highlight), then tap a zone to place it.</em>
+      <em>On mobile: tap a card to select it (it will highlight), then tap a zone to place it.</em>
     </p>
 
-    <p class="source-label">Tools to sort — drag each into a zone below · <span id="toolsCounter" style="color:var(--gold);">0 of 10 placed</span></p>
+    <p class="source-label">Behaviours to sort · <span id="toolsCounter" style="color:var(--gold);">0 of 10 placed</span></p>
     <div class="tool-source" id="toolSource">
-      <div class="tool-chip" draggable="true" data-tool="Pair">Pair</div>
-      <div class="tool-chip" draggable="true" data-tool="AIBots">AIBots</div>
-      <div class="tool-chip" draggable="true" data-tool="Transcribe">Transcribe</div>
-      <div class="tool-chip" draggable="true" data-tool="AORA">AORA</div>
-      <div class="tool-chip" draggable="true" data-tool="Navi">Navi</div>
-      <div class="tool-chip" draggable="true" data-tool="Copilot">Copilot</div>
-      <div class="tool-chip" draggable="true" data-tool="MS Teams">MS Teams</div>
-      <div class="tool-chip" draggable="true" data-tool="Power Apps">Power Apps</div>
-      <div class="tool-chip" draggable="true" data-tool="Power Automate">Power Automate</div>
-      <div class="tool-chip" draggable="true" data-tool="Power BI">Power BI</div>
+      <div class="behaviour-card" draggable="true" data-tool="B1" data-num="1">
+        <div class="behaviour-num">1</div>
+        <div class="behaviour-text">Using an AI tool to help draft or improve my work</div>
+      </div>
+      <div class="behaviour-card" draggable="true" data-tool="B2" data-num="2">
+        <div class="behaviour-num">2</div>
+        <div class="behaviour-text">Coordinating work through a shared digital workspace</div>
+      </div>
+      <div class="behaviour-card" draggable="true" data-tool="B3" data-num="3">
+        <div class="behaviour-num">3</div>
+        <div class="behaviour-text">Working in real time with colleagues on a shared document or file</div>
+      </div>
+      <div class="behaviour-card" draggable="true" data-tool="B4" data-num="4">
+        <div class="behaviour-num">4</div>
+        <div class="behaviour-text">Referring to a dashboard or data view when making a decision</div>
+      </div>
+      <div class="behaviour-card" draggable="true" data-tool="B5" data-num="5">
+        <div class="behaviour-num">5</div>
+        <div class="behaviour-text">Using AI to work through a problem or challenge my own thinking — not just to produce an output</div>
+      </div>
+      <div class="behaviour-card" draggable="true" data-tool="B6" data-num="6">
+        <div class="behaviour-num">6</div>
+        <div class="behaviour-text">Automating a repetitive task in my work</div>
+      </div>
+      <div class="behaviour-card" draggable="true" data-tool="B7" data-num="7">
+        <div class="behaviour-num">7</div>
+        <div class="behaviour-text">Looking beyond headline numbers to understand what is actually going on</div>
+      </div>
+      <div class="behaviour-card" draggable="true" data-tool="B8" data-num="8">
+        <div class="behaviour-num">8</div>
+        <div class="behaviour-text">Picking up a new digital tool without formal training</div>
+      </div>
+      <div class="behaviour-card" draggable="true" data-tool="B9" data-num="9">
+        <div class="behaviour-num">9</div>
+        <div class="behaviour-text">Redesigning a team process using digital tools</div>
+      </div>
+      <div class="behaviour-card" draggable="true" data-tool="B10" data-num="10">
+        <div class="behaviour-num">10</div>
+        <div class="behaviour-text">Helping a colleague get started with a digital or AI tool</div>
+      </div>
     </div>
 
     <div class="tool-grid-container">
@@ -1089,8 +1199,8 @@
         <div class="zone-header">
           <div class="zone-dot" style="background:var(--green)"></div>
           <div>
-            <div class="zone-label" style="color:var(--green)">Use Regularly & Confidently</div>
-            <div class="zone-desc">Part of my daily/weekly workflow</div>
+            <div class="zone-label" style="color:var(--green)">I do this regularly</div>
+            <div class="zone-desc">Part of how I work</div>
           </div>
         </div>
         <div class="zone-chips" id="chips-green"></div>
@@ -1099,7 +1209,7 @@
         <div class="zone-header">
           <div class="zone-dot" style="background:var(--amber)"></div>
           <div>
-            <div class="zone-label" style="color:var(--amber)">Tried But Don't Use Much</div>
+            <div class="zone-label" style="color:var(--amber)">I've tried this occasionally</div>
             <div class="zone-desc">Familiar but not embedded</div>
           </div>
         </div>
@@ -1109,7 +1219,7 @@
         <div class="zone-header">
           <div class="zone-dot" style="background:var(--red)"></div>
           <div>
-            <div class="zone-label" style="color:var(--red)">Know It Exists, Haven't Used It</div>
+            <div class="zone-label" style="color:var(--red)">I know it can be done, but I haven't</div>
             <div class="zone-desc">Aware but not yet engaged</div>
           </div>
         </div>
@@ -1119,8 +1229,8 @@
         <div class="zone-header">
           <div class="zone-dot" style="background:var(--slate)"></div>
           <div>
-            <div class="zone-label" style="color:var(--slate)">New to Me</div>
-            <div class="zone-desc">Haven't encountered this yet</div>
+            <div class="zone-label" style="color:var(--slate)">I haven't come across this</div>
+            <div class="zone-desc">New to me</div>
           </div>
         </div>
         <div class="zone-chips" id="chips-grey"></div>
