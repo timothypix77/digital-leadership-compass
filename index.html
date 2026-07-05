@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="only light">
 <meta name="supported-color-schemes" content="light">
+<meta name="theme-color" content="#0d1b2a">
 <title>Digital Leadership Compass</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -17,6 +18,11 @@
     --font-mono: 'DM Mono', 'Courier New', monospace;
   }
   html { color-scheme: only light; }
+
+  /* Samsung Internet dark mode override — forces our intended palette */
+  @media screen and (-webkit-min-device-pixel-ratio: 0) {
+    html, body { -webkit-filter: none !important; filter: none !important; }
+  }
 </style>
 <style>
   :root {
@@ -1065,7 +1071,8 @@
 
   /* Worktop is applied to .module-screen — keeps its layout but transforms visual style */
   .module-screen.worktop {
-    background: var(--worktop-bg) !important;
+    background-color: #f0f4f8 !important;
+    background-image: none !important;
     color: var(--worktop-text);
     border-radius: 14px;
     margin: 20px auto 32px !important;
@@ -1073,6 +1080,13 @@
     width: calc(100% - 48px);
     padding: 32px 32px 40px !important;
     flex: none;
+    /* Samsung Internet dark mode resistance */
+    -webkit-filter: none !important;
+    filter: none !important;
+  }
+  .module-screen.worktop * {
+    -webkit-filter: none !important;
+    filter: none !important;
   }
 
   @media (max-width: 640px) {
