@@ -23,17 +23,35 @@
     --gold-light: #ecd17a;
     --gold-dim: rgba(224,191,77,0.15);
     --gold-border: rgba(224,191,77,0.3);
+    --gold-dark: #a8891f;
     --slate: #8fa3b8;
     --slate-light: #b8ccd8;
     --white: #f0f4f8;
     --white-dim: rgba(240,244,248,0.07);
     --green: #4caf88;
     --green-dim: rgba(76,175,136,0.15);
+    --green-dark: #2d7a56;
+    --green-mid: #3d9b70;
     --amber: #e8a030;
     --amber-dim: rgba(232,160,48,0.15);
+    --amber-dark: #a8681a;
+    --amber-mid: #d18a20;
     --red: #e05252;
     --red-dim: rgba(224,82,82,0.12);
+    --red-dark: #a03535;
+    --red-mid: #c94040;
     --blue-accent: #5b9bd5;
+    /* Light worktop palette */
+    --worktop-bg: #f0f4f8;
+    --worktop-panel: #ffffff;
+    --worktop-tray: #dde4ec;
+    --worktop-placed-bg: #f4f7fa;
+    --worktop-text: #0d1b2a;
+    --worktop-text-mid: #2a3a4c;
+    --worktop-text-soft: #4a5c70;
+    --worktop-text-muted: #6c7d8f;
+    --worktop-border: rgba(0,0,0,0.08);
+    --worktop-border-strong: rgba(0,0,0,0.15);
     --radius: 12px;
     --radius-sm: 8px;
     --transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
@@ -1033,9 +1051,254 @@
   }
 
 
+  /* ═══════════════════════════════════════════════════════════════
+     LIGHT WORKTOP TREATMENT (Modules 1-4)
+     Wraps the interactive content area of each module in a light
+     background with dark text, differentiating it from the navy
+     compass header above and the navy page frame.
+  ═══════════════════════════════════════════════════════════════ */
+
+  /* Worktop is applied to .module-screen — keeps its layout but transforms visual style */
+  .module-screen.worktop {
+    background: var(--worktop-bg);
+    color: var(--worktop-text);
+    border-radius: 14px;
+    margin: 20px 24px 32px;
+    max-width: calc(820px + 48px);
+    padding: 32px 32px 40px;
+  }
+
+  @media (max-width: 640px) {
+    .module-screen.worktop { padding: 22px 18px 30px; margin: 16px 12px 24px; }
+  }
+
+  /* Text overrides inside worktop */
+  .worktop .module-title { color: var(--worktop-text); }
+  .worktop .module-desc { color: var(--worktop-text-soft); }
+  .worktop .module-tag { color: var(--gold-dark); background: var(--gold-dim); border-color: var(--gold-border); }
+  .worktop .source-label { color: var(--worktop-text-muted); }
+  .worktop .source-label #toolsCounter { color: var(--gold-dark); }
+
+  /* MODULE 1 — Behaviour cards on light worktop */
+  .worktop .tool-source {
+    background: var(--worktop-tray);
+    border: 1px solid var(--worktop-border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 24px;
+  }
+  .worktop .behaviour-card {
+    background: var(--worktop-panel);
+    border: 1px solid var(--worktop-border);
+    color: var(--worktop-text-mid);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .worktop .behaviour-card:hover {
+    border-color: var(--gold);
+    background: var(--worktop-panel);
+    color: var(--worktop-text);
+  }
+  .worktop .behaviour-card.selected {
+    background: rgba(224,191,77,0.15);
+    border-color: var(--gold);
+    color: var(--worktop-text);
+  }
+  .worktop .behaviour-num {
+    background: var(--gold);
+    color: var(--worktop-text);
+  }
+
+  /* MODULE 1 — Zones on white panels */
+  .worktop .tool-grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  @media (max-width: 640px) {
+    .worktop .tool-grid-container { grid-template-columns: 1fr; }
+  }
+  .worktop .tool-zone {
+    background: var(--worktop-panel);
+    border: 1px solid var(--worktop-border);
+    border-radius: 12px;
+    padding: 14px;
+    min-height: 130px;
+  }
+  .worktop .tool-zone.drag-over {
+    background: rgba(224,191,77,0.08);
+    border-color: var(--gold);
+  }
+  .worktop .zone-header {
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--worktop-border);
+    margin-bottom: 10px;
+  }
+  .worktop .zone-label { font-weight: 600; }
+  .worktop .zone-desc { color: var(--worktop-text-muted); }
+  /* Zone label colours in worktop use darker variants for contrast */
+  .worktop #zone-green .zone-label { color: var(--green-dark); }
+  .worktop #zone-amber .zone-label { color: var(--amber-dark); }
+  .worktop #zone-red .zone-label { color: var(--red-dark); }
+  .worktop #zone-grey .zone-label { color: var(--worktop-text-soft); }
+
+  /* Placed cards inside zones — quieter, no gold circle */
+  .worktop .zone-chips .behaviour-card {
+    background: var(--worktop-placed-bg);
+    border: 1px solid var(--worktop-border);
+    color: var(--worktop-text-mid);
+    box-shadow: none;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  .worktop .zone-chips .behaviour-card:hover {
+    border-color: var(--gold-border);
+    background: rgba(224,191,77,0.06);
+  }
+  .worktop .zone-chips .behaviour-num {
+    background: rgba(0,0,0,0.06);
+    color: var(--worktop-text-muted);
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+    border-radius: 4px;
+  }
+
+  /* MODULE 2 — Scenario cards on white with blue accent */
+  .worktop .scenario-card {
+    background: var(--worktop-panel);
+    border: 1px solid var(--worktop-border);
+    border-left: 3px solid var(--blue-accent);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+  }
+  .worktop .scenario-context { color: var(--blue-accent); }
+  .worktop .scenario-text { color: var(--worktop-text-mid); }
+  .worktop .scenario-text strong { color: var(--worktop-text); }
+
+  /* MODULE 2 — Choice cards */
+  .worktop .choice-card {
+    background: var(--worktop-panel);
+    border: 1px solid var(--worktop-border);
+    color: var(--worktop-text-mid);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+  .worktop .choice-card:hover { border-color: var(--gold); }
+  .worktop .choice-card.selected {
+    background: rgba(224,191,77,0.12);
+    border-color: var(--gold);
+    color: var(--worktop-text);
+  }
+  .worktop .choice-letter {
+    background: var(--worktop-tray);
+    color: var(--worktop-text-soft);
+  }
+  .worktop .choice-card.selected .choice-letter {
+    background: var(--gold);
+    color: var(--worktop-text);
+  }
+  .worktop .choice-text { color: var(--worktop-text-mid); }
+
+  /* MODULE 3 — True/False/Not Sure */
+  .worktop .ff-statement {
+    background: var(--worktop-panel);
+    border: 1px solid var(--worktop-border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+  }
+  .worktop .ff-text { color: var(--worktop-text-mid); }
+  .worktop .ff-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--worktop-text-muted);
+  }
+  .worktop .ff-count span { color: var(--gold-dark); }
+  .worktop .ff-btn {
+    background: var(--worktop-panel);
+    border: 1px solid var(--worktop-border-strong);
+    color: var(--worktop-text-soft);
+  }
+  .worktop .ff-btn:hover { border-color: var(--gold); color: var(--worktop-text); }
+  .worktop .ff-btn.selected-true {
+    background: rgba(61,155,112,0.15);
+    border-color: var(--green-mid);
+    color: var(--green-dark);
+  }
+  .worktop .ff-btn.selected-false {
+    background: rgba(201,64,64,0.15);
+    border-color: var(--red-mid);
+    color: var(--red-dark);
+  }
+  .worktop .ff-btn.selected-unsure {
+    background: rgba(209,138,32,0.15);
+    border-color: var(--amber-mid);
+    color: var(--amber-dark);
+  }
+
+  /* MODULE 4 — Trade-off pairs */
+  .worktop .tradeoff-card {
+    background: var(--worktop-panel);
+    border: 1px solid var(--worktop-border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .worktop .tradeoff-num { color: var(--worktop-text-muted); }
+  .worktop .tradeoff-option {
+    background: var(--worktop-placed-bg);
+    border: 1px solid var(--worktop-border);
+    color: var(--worktop-text-mid);
+  }
+  .worktop .tradeoff-option:hover { border-color: var(--gold); }
+  .worktop .tradeoff-option.selected {
+    background: rgba(224,191,77,0.15);
+    border-color: var(--gold);
+    color: var(--worktop-text);
+  }
+  .worktop .tradeoff-vs { color: var(--worktop-text-muted); }
+
+  /* Open text area */
+  .worktop .open-text-label { color: var(--worktop-text-mid); }
+  .worktop .open-text-label strong { color: var(--worktop-text); }
+  .worktop .open-text-box {
+    background: var(--worktop-panel);
+    border: 1px solid var(--worktop-border-strong);
+    color: var(--worktop-text-mid);
+  }
+  .worktop .open-text-box::placeholder { color: var(--worktop-text-muted); }
+
+  /* Divider inside worktop */
+  .worktop .divider { background: var(--worktop-border); }
+
+  /* Navigation buttons at bottom of worktop */
+  .worktop .nav-row {
+    border-top: 1px solid var(--worktop-border);
+    padding-top: 18px;
+    margin-top: 22px;
+  }
+  .worktop .btn-ghost {
+    background: transparent;
+    color: var(--worktop-text-soft);
+    border: 1px solid var(--worktop-border-strong);
+  }
+  .worktop .btn-ghost:hover {
+    background: rgba(0,0,0,0.03);
+    border-color: var(--worktop-text-soft);
+    color: var(--worktop-text);
+  }
+  /* btn-primary stays gold — already looks good on light */
+
+  /* Validation error inside worktop */
+  .worktop .validation-error {
+    color: var(--red-dark);
+  }
+
+  /* Zone dot for placed indicator */
+  .worktop .zone-dot { box-shadow: 0 0 0 2px var(--worktop-panel); }
+
 </style>
-</head>
-<body>
 
 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 
@@ -1137,7 +1400,7 @@
     <div class="module-indicator">Module <span>01</span> / 04</div>
   </div>
 
-  <div class="module-screen fade-up">
+  <div class="module-screen fade-up worktop">
     <div class="module-tag">
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
       Digital Fluency & Product Mastery
@@ -1146,11 +1409,11 @@
     <p class="module-desc">
       Below is a set of digital work behaviours. Sort each into the zone that best describes how it fits into your work today. There are no right answers — place each behaviour where it honestly sits for you.
     </p>
-    <p class="module-desc" style="font-size:13px; color:var(--slate); margin-top:-24px; margin-bottom:28px;">
+    <p class="module-desc" style="font-size:13px; color:var(--worktop-text-muted); margin-top:-24px; margin-bottom:28px;">
       <em>On mobile: tap a card to select it (it will highlight), then tap a zone to place it.</em>
     </p>
 
-    <p class="source-label">Behaviours to sort · <span id="toolsCounter" style="color:var(--gold);">0 of 10 placed</span></p>
+    <p class="source-label">Behaviours to sort · <span id="toolsCounter" style="color:var(--gold-dark);">0 of 10 placed</span></p>
     <div class="tool-source" id="toolSource">
       <div class="behaviour-card" draggable="true" data-tool="B1" data-num="1">
         <div class="behaviour-num">1</div>
@@ -1197,40 +1460,40 @@
     <div class="tool-grid-container">
       <div class="tool-zone" id="zone-green">
         <div class="zone-header">
-          <div class="zone-dot" style="background:var(--green)"></div>
+          <div class="zone-dot" style="background:var(--green-mid)"></div>
           <div>
-            <div class="zone-label" style="color:var(--green)">I do this regularly</div>
-            <div class="zone-desc">Part of how I work</div>
+            <div class="zone-label">Regularly</div>
+            <div class="zone-desc">This is embedded in how I work</div>
           </div>
         </div>
         <div class="zone-chips" id="chips-green"></div>
       </div>
       <div class="tool-zone" id="zone-amber">
         <div class="zone-header">
-          <div class="zone-dot" style="background:var(--amber)"></div>
+          <div class="zone-dot" style="background:var(--amber-mid)"></div>
           <div>
-            <div class="zone-label" style="color:var(--amber)">I've tried this occasionally</div>
-            <div class="zone-desc">Familiar but not embedded</div>
+            <div class="zone-label">Sometimes</div>
+            <div class="zone-desc">I've done this but not consistently</div>
           </div>
         </div>
         <div class="zone-chips" id="chips-amber"></div>
       </div>
       <div class="tool-zone" id="zone-red">
         <div class="zone-header">
-          <div class="zone-dot" style="background:var(--red)"></div>
+          <div class="zone-dot" style="background:var(--red-mid)"></div>
           <div>
-            <div class="zone-label" style="color:var(--red)">I know it can be done, but I haven't</div>
-            <div class="zone-desc">Aware but not yet engaged</div>
+            <div class="zone-label">Not yet</div>
+            <div class="zone-desc">I understand it but haven't done it</div>
           </div>
         </div>
         <div class="zone-chips" id="chips-red"></div>
       </div>
       <div class="tool-zone" id="zone-grey">
         <div class="zone-header">
-          <div class="zone-dot" style="background:var(--slate)"></div>
+          <div class="zone-dot" style="background:#6c7d8f"></div>
           <div>
-            <div class="zone-label" style="color:var(--slate)">I haven't come across this</div>
-            <div class="zone-desc">New to me</div>
+            <div class="zone-label">Unfamiliar</div>
+            <div class="zone-desc">This is new to me</div>
           </div>
         </div>
         <div class="zone-chips" id="chips-grey"></div>
@@ -1268,7 +1531,7 @@
     <div class="module-indicator">Module <span>02</span> / 04</div>
   </div>
 
-  <div class="module-screen fade-up">
+  <div class="module-screen fade-up worktop">
     <div class="module-tag">
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
       Digital-enabled Ways of Working
@@ -1369,7 +1632,7 @@
     <div class="module-indicator">Module <span>03</span> / 04</div>
   </div>
 
-  <div class="module-screen fade-up">
+  <div class="module-screen fade-up worktop">
     <div class="module-tag">
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       Responsible AI & Governance
@@ -1495,7 +1758,7 @@
     <div class="module-indicator">Module <span>04</span> / 04</div>
   </div>
 
-  <div class="module-screen fade-up">
+  <div class="module-screen fade-up worktop">
     <div class="module-tag">
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Digital Leadership Mindset
