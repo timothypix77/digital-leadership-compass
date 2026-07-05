@@ -545,7 +545,7 @@ function updateToolsCounter() {
   if (!counterEl) return;
   const placed = state.tools.green.length + state.tools.amber.length + state.tools.red.length + state.tools.grey.length;
   counterEl.textContent = placed + ' of 10 placed';
-  counterEl.style.color = placed === 10 ? 'var(--green)' : 'var(--gold)';
+  counterEl.style.color = placed === 10 ? 'var(--green-dark)' : 'var(--gold-dark)';
 }
 
 function showValidationError(button, message) {
