@@ -1060,16 +1060,24 @@
 
   /* Worktop is applied to .module-screen — keeps its layout but transforms visual style */
   .module-screen.worktop {
-    background: var(--worktop-bg);
+    background: var(--worktop-bg) !important;
     color: var(--worktop-text);
     border-radius: 14px;
-    margin: 20px 24px 32px;
+    margin: 20px auto 32px !important;
     max-width: calc(820px + 48px);
-    padding: 32px 32px 40px;
+    width: calc(100% - 48px);
+    padding: 32px 32px 40px !important;
+    flex: none;
   }
 
   @media (max-width: 640px) {
-    .module-screen.worktop { padding: 22px 18px 30px; margin: 16px 12px 24px; }
+    .module-screen.worktop {
+      padding: 22px 18px 30px !important;
+      margin: 16px auto 24px !important;
+      width: calc(100% - 24px);
+      max-width: none;
+      border-radius: 12px;
+    }
   }
 
   /* Text overrides inside worktop */
