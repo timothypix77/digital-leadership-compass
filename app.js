@@ -5,17 +5,18 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 async function saveResponse(scores, archetype) {
   try {
     const payload = {
-      name:          state.respondent.name,
-      department:    state.respondent.department,
-      email:         state.respondent.email,
-      fluency_score: scores.fluency,
-      ways_score:    scores.data,
-      ai_score:      scores.ai,
-      mindset_score: scores.mindset,
-      archetype:     archetype,
-      scenario_a:    state.scenarioA || '',
-      scenario_b:    state.scenarioB || '',
-      open_text:     state.openText  || ''
+      name:               state.respondent.name,
+      department:         state.respondent.department,
+      email:              state.respondent.email,
+      fluency_score:      scores.fluency,
+      ways_score:         scores.data,
+      ai_score:           scores.ai,
+      mindset_score:      scores.mindset,
+      archetype:          archetype,
+      scenario_a:         state.scenarioA || '',
+      scenario_b:         state.scenarioB || '',
+      open_text:          state.openText  || '',
+      instrument_version: 'v2_behaviours'
     };
     const response = await fetch(SUPABASE_URL + '/rest/v1/responses', {
       method: 'POST',
@@ -55,10 +56,10 @@ function goToScreen(id) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
   // Re-attach drag listeners when module1 becomes visible
   if (id === 'module1') {
-    document.querySelectorAll('#toolSource .tool-chip').forEach(chip => {
+    document.querySelectorAll('#toolSource .behaviour-card').forEach(card => {
       // Remove old listeners by cloning
-      const fresh = chip.cloneNode(true);
-      chip.parentNode.replaceChild(fresh, chip);
+      const fresh = card.cloneNode(true);
+      card.parentNode.replaceChild(fresh, card);
       attachDragListeners(fresh);
     });
   }
@@ -98,7 +99,37 @@ document.getElementById('btnStart').addEventListener('click', startGame);
 
 // ─── MODULE 1: DRAG & DROP (desktop) + TAP TO PLACE (mobile) ─────────────────
 
-var selectedChip = null; // tracks currently selected chip on touch devices
+var selectedChip = null; // tracks currently selected card on touch devices
+
+// Behaviour data — kept in JS for consistency and easy rebuild on restart
+const BEHAVIOURS = [
+  { id: 'B1',  num: 1,  text: 'Using an AI tool to help draft or improve my work' },
+  { id: 'B2',  num: 2,  text: 'Coordinating work through a shared digital workspace' },
+  { id: 'B3',  num: 3,  text: 'Working in real time with colleagues on a shared document or file' },
+  { id: 'B4',  num: 4,  text: 'Referring to a dashboard or data view when making a decision' },
+  { id: 'B5',  num: 5,  text: 'Using AI to work through a problem or challenge my own thinking — not just to produce an output' },
+  { id: 'B6',  num: 6,  text: 'Automating a repetitive task in my work' },
+  { id: 'B7',  num: 7,  text: 'Looking beyond headline numbers to understand what is actually going on' },
+  { id: 'B8',  num: 8,  text: 'Picking up a new digital tool without formal training' },
+  { id: 'B9',  num: 9,  text: 'Redesigning a team process using digital tools' },
+  { id: 'B10', num: 10, text: 'Helping a colleague get started with a digital or AI tool' }
+];
+
+// Meta-skill mapping for sub-score reporting (kept for future use)
+const BEHAVIOUR_META = {
+  B1: 'applied_ai',      B5: 'applied_ai',
+  B2: 'collaboration',   B3: 'collaboration',
+  B4: 'data_practice',   B7: 'data_practice',
+  B6: 'work_redesign',   B9: 'work_redesign',
+  B8: 'learning_agency', B10: 'learning_agency'
+};
+
+// Difficulty weight per behaviour (basic=1, intermediate=1.25, advanced=1.5)
+const BEHAVIOUR_DIFFICULTY = {
+  B1: 1.0,  B2: 1.0,  B3: 1.0,  B4: 1.0,       // basic
+  B5: 1.25, B6: 1.25, B7: 1.25, B8: 1.25,      // intermediate
+  B9: 1.5,  B10: 1.5                            // advanced
+};
 
 function isTouchDevice() {
   return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
@@ -106,41 +137,51 @@ function isTouchDevice() {
 
 function clearChipSelection() {
   if (selectedChip) {
-    selectedChip.style.border = '';
-    selectedChip.style.background = '';
+    selectedChip.classList.remove('selected');
     selectedChip = null;
   }
-  document.querySelectorAll('#toolSource .tool-chip').forEach(c => {
-    c.style.border = '';
-    c.style.background = '';
+  document.querySelectorAll('#toolSource .behaviour-card').forEach(c => {
+    c.classList.remove('selected');
   });
 }
 
-function attachDragListeners(chip) {
+function highlightNextCard() {
+  const src = document.getElementById('toolSource');
+  const remaining = src.querySelectorAll('.behaviour-card');
+  if (remaining.length === 0) return;
+  // Sort by num and highlight the first one
+  const cards = [...remaining].sort((a, b) => parseInt(a.dataset.num) - parseInt(b.dataset.num));
+  const next = cards[0];
+  next.classList.remove('highlight-next');
+  void next.offsetWidth; // force reflow to restart animation
+  next.classList.add('highlight-next');
+  setTimeout(() => next.classList.remove('highlight-next'), 1300);
+}
+
+function attachDragListeners(card) {
   // Desktop drag
-  chip.addEventListener('dragstart', e => {
-    draggedTool = chip;
-    setTimeout(() => chip.classList.add('dragging'), 0);
+  card.addEventListener('dragstart', e => {
+    draggedTool = card;
+    setTimeout(() => card.classList.add('dragging'), 0);
   });
-  chip.addEventListener('dragend', () => {
-    chip.classList.remove('dragging');
+  card.addEventListener('dragend', () => {
+    card.classList.remove('dragging');
     draggedTool = null;
   });
-  // Mobile tap — select chip
-  chip.addEventListener('click', () => {
+  // Mobile tap — select card
+  card.addEventListener('click', () => {
     if (!isTouchDevice() && !('ontouchstart' in window)) return;
-    if (selectedChip === chip) {
+    if (selectedChip === card) {
       clearChipSelection();
       return;
     }
     clearChipSelection();
-    selectedChip = chip;
-    chip.style.border = '2px solid #c9a84c';
-    chip.style.background = 'rgba(201,168,76,0.18)';
+    selectedChip = card;
+    card.classList.add('selected');
   });
 }
 
-document.querySelectorAll('.tool-chip').forEach(chip => attachDragListeners(chip));
+document.querySelectorAll('.behaviour-card').forEach(card => attachDragListeners(card));
 
 function handleDragOver(e) {
   e.preventDefault();
@@ -151,37 +192,43 @@ function handleDragLeave(e) {
   e.currentTarget.classList.remove('drag-over');
 }
 
-function placeToolInZone(toolName, toolLabel, zone) {
+function placeToolInZone(toolId, zone) {
+  const behaviour = BEHAVIOURS.find(b => b.id === toolId);
+  if (!behaviour) return;
+
   // Remove from all zones and source
   ['green','amber','red','grey'].forEach(z => {
-    state.tools[z] = state.tools[z].filter(t => t !== toolName);
+    state.tools[z] = state.tools[z].filter(t => t !== toolId);
     const container = document.getElementById('chips-' + z);
-    [...container.querySelectorAll('.tool-chip')].forEach(c => {
-      if (c.dataset.tool === toolName) c.remove();
+    [...container.querySelectorAll('.behaviour-card')].forEach(c => {
+      if (c.dataset.tool === toolId) c.remove();
     });
   });
   const src = document.getElementById('toolSource');
-  [...src.querySelectorAll('.tool-chip')].forEach(c => {
-    if (c.dataset.tool === toolName) c.remove();
+  [...src.querySelectorAll('.behaviour-card')].forEach(c => {
+    if (c.dataset.tool === toolId) c.remove();
   });
-  // Add to new zone
-  state.tools[zone].push(toolName);
+
+  // Add to new zone as a placed behaviour card
+  state.tools[zone].push(toolId);
   const container = document.getElementById('chips-' + zone);
-  const newChip = document.createElement('div');
-  newChip.className = 'tool-chip';
-  newChip.dataset.tool = toolName;
-  newChip.textContent = toolLabel;
-  newChip.title = 'Tap or click to return to source';
-  newChip.addEventListener('click', () => returnToSource(newChip, zone));
-  container.appendChild(newChip);
+  const placedCard = document.createElement('div');
+  placedCard.className = 'behaviour-card';
+  placedCard.dataset.tool = toolId;
+  placedCard.dataset.num = behaviour.num;
+  placedCard.title = 'Tap or click to return to source';
+  placedCard.innerHTML = '<div class="behaviour-num">' + behaviour.num + '</div><div class="behaviour-text">' + behaviour.text + '</div>';
+  placedCard.addEventListener('click', () => returnToSource(placedCard, zone));
+  container.appendChild(placedCard);
   updateToolsCounter();
+  highlightNextCard();
 }
 
 function handleDrop(e, zone) {
   e.preventDefault();
   e.currentTarget.classList.remove('drag-over');
   if (!draggedTool) return;
-  placeToolInZone(draggedTool.dataset.tool, draggedTool.textContent, zone);
+  placeToolInZone(draggedTool.dataset.tool, zone);
 }
 
 // Attach drag and tap zone listeners
@@ -190,28 +237,38 @@ function handleDrop(e, zone) {
   el.addEventListener('dragover', handleDragOver);
   el.addEventListener('dragleave', handleDragLeave);
   el.addEventListener('drop', e => handleDrop(e, zone));
-  // Mobile tap on zone — place selected chip
+  // Mobile tap on zone — place selected card
   el.addEventListener('click', e => {
     if (!selectedChip) return;
-    // Make sure the click is on the zone itself, not a chip inside it
-    if (e.target.classList.contains('tool-chip')) return;
-    placeToolInZone(selectedChip.dataset.tool, selectedChip.textContent, zone);
+    // Ignore clicks on placed cards inside the zone
+    if (e.target.closest('.behaviour-card')) return;
+    placeToolInZone(selectedChip.dataset.tool, zone);
     clearChipSelection();
   });
 });
 
-function returnToSource(chip, zone) {
-  const toolName = chip.dataset.tool;
-  state.tools[zone] = state.tools[zone].filter(t => t !== toolName);
-  chip.remove();
+function returnToSource(card, zone) {
+  const toolId = card.dataset.tool;
+  const behaviour = BEHAVIOURS.find(b => b.id === toolId);
+  if (!behaviour) return;
+  state.tools[zone] = state.tools[zone].filter(t => t !== toolId);
+  card.remove();
   const src = document.getElementById('toolSource');
   const restored = document.createElement('div');
-  restored.className = 'tool-chip';
+  restored.className = 'behaviour-card';
   restored.draggable = true;
-  restored.dataset.tool = toolName;
-  restored.textContent = toolName;
+  restored.dataset.tool = toolId;
+  restored.dataset.num = behaviour.num;
+  restored.innerHTML = '<div class="behaviour-num">' + behaviour.num + '</div><div class="behaviour-text">' + behaviour.text + '</div>';
   attachDragListeners(restored);
-  src.appendChild(restored);
+  // Re-insert in numeric order
+  const existing = [...src.querySelectorAll('.behaviour-card')];
+  const insertBefore = existing.find(c => parseInt(c.dataset.num) > behaviour.num);
+  if (insertBefore) {
+    src.insertBefore(restored, insertBefore);
+  } else {
+    src.appendChild(restored);
+  }
   clearChipSelection();
   updateToolsCounter();
 }
@@ -222,9 +279,23 @@ function returnToSource(chip, zone) {
 
 // ─── SCORING ──────────────────────────────────────────────────
 function computeScores() {
-  const totalSorted = state.tools.green.length + state.tools.amber.length + state.tools.red.length + state.tools.grey.length;
-  const fluencyRaw = totalSorted === 0 ? 50 :
-    Math.round(((state.tools.green.length * 100 + state.tools.amber.length * 60 + state.tools.red.length * 30 + state.tools.grey.length * 5) / (totalSorted * 100)) * 100);
+  // Zone weights: green=100, amber=60, red=30, grey=5
+  const zoneWeights = { green: 100, amber: 60, red: 30, grey: 5 };
+  let weightedScore = 0;
+  let totalWeight = 0;
+  let sortedCount = 0;
+
+  ['green','amber','red','grey'].forEach(zone => {
+    state.tools[zone].forEach(toolId => {
+      const difficulty = BEHAVIOUR_DIFFICULTY[toolId] || 1.0;
+      weightedScore += zoneWeights[zone] * difficulty;
+      totalWeight += 100 * difficulty;
+      sortedCount++;
+    });
+  });
+
+  const fluencyRaw = sortedCount === 0 ? 50 :
+    Math.round((weightedScore / totalWeight) * 100);
 
   // Digital-enabled Ways of Working: scored from scenario A and B responses
   // Scenario A: B=process-first+integration rigour, C=experimentation, E=process simplification, D=risk-cautious, A=top-down
@@ -436,20 +507,15 @@ function restartGame() {
 
   const src = document.getElementById('toolSource');
   src.innerHTML = '';
-  const tools = [
-    ['Pair','Pair'],['AIBots','AIBots'],['Transcribe','Transcribe'],
-    ['AORA','AORA'],['Navi','Navi'],['Copilot','Copilot'],
-    ['MS Teams','MS Teams'],['Power Apps','Power Apps'],
-    ['Power Automate','Power Automate'],['Power BI','Power BI'],
-  ];
-  tools.forEach(([dataName, label]) => {
-    const chip = document.createElement('div');
-    chip.className = 'tool-chip';
-    chip.draggable = true;
-    chip.dataset.tool = dataName;
-    chip.textContent = label;
-    attachDragListeners(chip);
-    src.appendChild(chip);
+  BEHAVIOURS.forEach(b => {
+    const card = document.createElement('div');
+    card.className = 'behaviour-card';
+    card.draggable = true;
+    card.dataset.tool = b.id;
+    card.dataset.num = b.num;
+    card.innerHTML = '<div class="behaviour-num">' + b.num + '</div><div class="behaviour-text">' + b.text + '</div>';
+    attachDragListeners(card);
+    src.appendChild(card);
   });
 
   document.querySelectorAll('#module2choicesA .choice-card, #module2choicesB .choice-card').forEach(c => c.classList.remove('selected'));
